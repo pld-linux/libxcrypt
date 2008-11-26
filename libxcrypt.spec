@@ -46,6 +46,8 @@ install -d $RPM_BUILD_ROOT%{_libdir}
 	DESTDIR=$RPM_BUILD_ROOT
 
 mv $RPM_BUILD_ROOT/%{_lib}/lib*.{l,}a $RPM_BUILD_ROOT%{_libdir}
+sed -i -e 's#/%{_lib}#%{_libdir}#g' $RPM_BUILD_ROOT%{_libdir}/*.la
+
 for lib in $RPM_BUILD_ROOT/%{_lib}/lib*.so.*; do
 	lib=$(echo $lib | sed -e "s#$RPM_BUILD_ROOT##g")
 	slib=$(basename $lib | sed -e 's#\.so\..*#.so#g')
