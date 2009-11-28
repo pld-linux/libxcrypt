@@ -8,6 +8,8 @@ Source0:	ftp://ftp.suse.com/pub/people/kukuk/libxcrypt/%{name}-%{version}.tar.bz
 # Source0-md5:	56cf4285086f26649b8792b53fe8b00f
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%undefine	__cxx
+
 %description
 Libxcrypt is a replacement for libcrypt, which comes with the GNU C
 Library. It supports DES crypt, MD5, and passwords with blowfish
