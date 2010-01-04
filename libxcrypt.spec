@@ -1,7 +1,7 @@
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Name:		libxcrypt
 Version:	3.0.2
-Release:	1
+Release:	2
 License:	LGPL v2+, Public Domain, Freeware
 Group:		Libraries
 Source0:	ftp://ftp.suse.com/pub/people/kukuk/libxcrypt/%{name}-%{version}.tar.bz2
@@ -18,7 +18,7 @@ encryption.
 %package devel
 Summary:	Header files and develpment documentation for libxcrypt
 Group:		Development/Libraries
-Requires:	%{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
 This package contains the header files to develop software using
@@ -27,7 +27,7 @@ libxcrypt.
 %package static
 Summary:	Static libxcrypt library
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 This package contains the static library used for development.
@@ -66,7 +66,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc ChangeLog NEWS README*
 %attr(755,root,root) /%{_lib}/libxcrypt.so.*
-%dir  /%{_lib}/xcrypt
+%dir /%{_lib}/xcrypt
 %attr(755,root,root) /%{_lib}/xcrypt/libxcrypt*.so*
 
 %files devel
