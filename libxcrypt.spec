@@ -8,6 +8,7 @@ Group:		Libraries
 Source0:	ftp://ftp.suse.com/pub/people/kukuk/libxcrypt/%{name}-%{version}.tar.bz2
 # Source0-md5:	56cf4285086f26649b8792b53fe8b00f
 Patch0:		%{name}-noWerror.patch
+Patch1:		%{name}-libc-lock.patch
 BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -55,6 +56,7 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %configure \
