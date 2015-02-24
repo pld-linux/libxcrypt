@@ -2,7 +2,7 @@ Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
 Version:	3.0.2
-Release:	2
+Release:	3
 License:	LGPL v2.1+ (library), LGPL v2.1+/Public Domain (plugins)
 Group:		Libraries
 Source0:	ftp://ftp.suse.com/pub/people/kukuk/libxcrypt/%{name}-%{version}.tar.bz2
