@@ -1,12 +1,11 @@
-diff -dur libxcrypt-3.0.2.orig/configure.in libxcrypt-3.0.2/configure.in
---- libxcrypt-3.0.2.orig/configure.in	2008-07-16 14:30:29.000000000 +0200
-+++ libxcrypt-3.0.2/configure.in	2012-06-19 12:27:48.000000000 +0200
-@@ -29,7 +29,7 @@
- 
- EXTRA_CFLAGS=""
- if eval "test x$GCC = xyes"; then
--    EXTRA_CFLAGS="-W -Wall -Wbad-function-cast -Wcast-align -Wcast-qual -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wstrict-prototypes -Wundef -Wpointer-arith -Werror"
-+    EXTRA_CFLAGS="-W -Wall -Wbad-function-cast -Wcast-align -Wcast-qual -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wstrict-prototypes -Wundef -Wpointer-arith"
+--- libxcrypt-3.1.1/configure.ac.orig	2015-05-13 01:29:46.000000000 +0200
++++ libxcrypt-3.1.1/configure.ac	2017-04-10 18:59:27.731520714 +0200
+@@ -38,7 +38,7 @@
+     EXTRA_CFLAGS="$EXTRA_CFLAGS -Wcast-qual -Winline"
+     EXTRA_CFLAGS="$EXTRA_CFLAGS -Wmissing-declarations -Wmissing-prototypes"
+     EXTRA_CFLAGS="$EXTRA_CFLAGS -Wnested-externs -Wshadow -Wstrict-prototypes"
+-    EXTRA_CFLAGS="$EXTRA_CFLAGS -Wundef -Wpointer-arith -Werror"
++    EXTRA_CFLAGS="$EXTRA_CFLAGS -Wundef -Wpointer-arith"
  fi
  AC_SUBST(EXTRA_CFLAGS)
  

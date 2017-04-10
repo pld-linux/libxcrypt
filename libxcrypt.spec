@@ -1,14 +1,20 @@
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
-Version:	3.0.2
-Release:	3
+Version:	3.1.1
+Release:	1
 License:	LGPL v2.1+ (library), LGPL v2.1+/Public Domain (plugins)
 Group:		Libraries
-Source0:	ftp://ftp.suse.com/pub/people/kukuk/libxcrypt/%{name}-%{version}.tar.bz2
-# Source0-md5:	56cf4285086f26649b8792b53fe8b00f
+#Source0Download: https://github.com/besser82/libxcrypt/releases
+Source0:	https://github.com/besser82/libxcrypt/archive/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	7eff183695f0dc4744b0f4bc8334eae9
 Patch0:		%{name}-noWerror.patch
 Patch1:		%{name}-libc-lock.patch
+Patch2:		%{name}-link.patch
+URL:		https://github.com/besser82/libxcrypt
+BuildRequires:	autoconf >= 2.50
+BuildRequires:	automake >= 1:1.7
+BuildRequires:	libtool >= 2:2
 BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -57,8 +63,14 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
+%{__libtoolize}
+%{__aclocal} -I m4
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 %configure \
 	--libdir=/%{_lib}
 %{__make}
@@ -70,8 +82,8 @@ install -d $RPM_BUILD_ROOT%{_libdir}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-mv -f $RPM_BUILD_ROOT/%{_lib}/libxcrypt.{so,la,a} $RPM_BUILD_ROOT%{_libdir}
-sed -i -e 's#/%{_lib}#%{_libdir}#g' $RPM_BUILD_ROOT%{_libdir}/libxcrypt.la
+%{__mv} $RPM_BUILD_ROOT/%{_lib}/libxcrypt.{so,la,a} $RPM_BUILD_ROOT%{_libdir}
+%{__sed} -i -e 's#/%{_lib}#%{_libdir}#g' $RPM_BUILD_ROOT%{_libdir}/libxcrypt.la
 ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/libxcrypt.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so
 
 %{__rm} $RPM_BUILD_ROOT/%{_lib}/xcrypt/*.{la,a}
