@@ -69,7 +69,6 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %{__automake}
 %configure \
 	--includedir=%{_includedir}/xcrypt \
-	--disable-obsolete-api \
 	--disable-werror \
 	--disable-xcrypt-compat-files
 %{__make}
@@ -84,6 +83,9 @@ install -d $RPM_BUILD_ROOT/%{_lib}
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so.* $RPM_BUILD_ROOT/%{_lib}
 ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/libxcrypt.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so
 
+# PLD doesn't need Owl compatibility
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libowcrypt.*
+# packaged with glibc-devel
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*
 
 %clean

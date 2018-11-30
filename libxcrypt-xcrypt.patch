@@ -25,10 +25,10 @@
  # Build libcrypt.so.2 if obsolete APIs are excluded, libcrypt.so.1 otherwise.
  if ENABLE_OBSOLETE_API
 -libcrypt_la_VERSION = 2:0:1
-+libxcrypt_la_VERSION = 2:0:1
++libxcrypt_la_VERSION = 3:0:1
  else
 -libcrypt_la_VERSION = 2:0:0
-+libxcrypt_la_VERSION = 2:0:0
++libxcrypt_la_VERSION = 3:0:0
  endif
  
 -libcrypt_la_LDFLAGS = -version-info $(libcrypt_la_VERSION)
