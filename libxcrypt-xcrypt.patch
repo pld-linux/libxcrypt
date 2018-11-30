@@ -1,0 +1,209 @@
+--- libxcrypt-4.4.0/Makefile.am.orig	2018-11-19 20:39:12.000000000 +0100
++++ libxcrypt-4.4.0/Makefile.am	2018-11-29 20:46:27.369590776 +0100
+@@ -37,17 +37,13 @@
+ 	alg-yescrypt-sysendian.h byteorder.h crypt-common.h \
+ 	crypt-obsolete.h crypt-port.h test-des-cases.h
+ 
+-if ENABLE_XCRYPT_COMPAT_FILES
+ include_HEADERS = xcrypt.h
+-else
+-noinst_HEADERS += xcrypt.h
+-endif
+ 
+ 
+ noinst_PROGRAMS = gen-des-tables
+ 
+-lib_LTLIBRARIES = libcrypt.la
+-libcrypt_la_SOURCES = \
++lib_LTLIBRARIES = libxcrypt.la
++libxcrypt_la_SOURCES = \
+ 	alg-des.c alg-des-tables.c alg-gost3411-2012-core.c \
+ 	alg-gost3411-2012-hmac.c alg-hmac-sha1.c alg-md4.c alg-md5.c \
+ 	alg-sha1.c alg-sha256.c alg-sha512.c alg-yescrypt-opt.c \
+@@ -75,23 +71,23 @@
+ 
+ # Build libcrypt.so.2 if obsolete APIs are excluded, libcrypt.so.1 otherwise.
+ if ENABLE_OBSOLETE_API
+-libcrypt_la_VERSION = 2:0:1
++libxcrypt_la_VERSION = 2:0:1
+ else
+-libcrypt_la_VERSION = 2:0:0
++libxcrypt_la_VERSION = 2:0:0
+ endif
+ 
+-libcrypt_la_LDFLAGS = -version-info $(libcrypt_la_VERSION)
++libxcrypt_la_LDFLAGS = -version-info $(libxcrypt_la_VERSION)
+ 
+ if HAVE_VSCRIPT
+-libcrypt_la_LDFLAGS += $(VSCRIPT_LDFLAGS),$(builddir)/libcrypt.map
++libxcrypt_la_LDFLAGS += $(VSCRIPT_LDFLAGS),$(builddir)/libcrypt.map
+ endif
+ 
+-libcrypt_la_LDFLAGS += $(UNDEF_FLAG) $(TEXT_RELOC_FLAG)
++libxcrypt_la_LDFLAGS += $(UNDEF_FLAG) $(TEXT_RELOC_FLAG)
+ 
+-libcrypt_la_CPPFLAGS = $(AM_CPPFLAGS) -DIN_LIBCRYPT
++libxcrypt_la_CPPFLAGS = $(AM_CPPFLAGS) -DIN_LIBCRYPT
+ 
+ CONFIG_STATUS_DEPENDENCIES = libcrypt.minver
+-EXTRA_libcrypt_la_DEPENDENCIES = libcrypt.map
++EXTRA_libxcrypt_la_DEPENDENCIES = libcrypt.map
+ CLEANFILES = Makefile.deps.T Makefile.deps \
+ 	libcrypt.map libcrypt.map.T \
+ 	crypt-symbol-vers.h crypt-symbol-vers.h.T \
+@@ -151,9 +147,9 @@
+ 	uninstall-hook-xcrypt-static
+ install-exec-hook-xcrypt-static:
+ 	cd $(DESTDIR)$(libdir) && \
+-		$(LN_S) libcrypt.a libxcrypt.a
++		$(LN_S) libxcrypt.a libcrypt.a
+ uninstall-hook-xcrypt-static:
+-	-rm -f $(DESTDIR)$(libdir)/libxcrypt.a
++	-rm -f $(DESTDIR)$(libdir)/libcrypt.a
+ endif
+ 
+ if ENABLE_SHARED
+@@ -166,9 +162,9 @@
+ 	uninstall-hook-xcrypt-shared
+ install-exec-hook-xcrypt-shared:
+ 	cd $(DESTDIR)$(libdir) && \
+-		$(LN_S) libcrypt.so libxcrypt.so
++		$(LN_S) libxcrypt.so libcrypt.so
+ uninstall-hook-xcrypt-shared:
+-	-rm -f $(DESTDIR)$(libdir)/libxcrypt.so
++	-rm -f $(DESTDIR)$(libdir)/libcrypt.so
+ endif
+ endif
+ 
+@@ -195,7 +191,7 @@
+ 	uninstall-hook-libstatic
+ install-exec-hook-libstatic:
+ 	cd $(DESTDIR)$(libdir) && \
+-		$(LN_S) libcrypt.a libowcrypt.a
++		$(LN_S) libxcrypt.a libowcrypt.a
+ uninstall-hook-libstatic:
+ 	-rm -f $(DESTDIR)$(libdir)/libowcrypt.a
+ endif
+@@ -208,8 +204,8 @@
+ 	uninstall-hook-libshared
+ install-exec-hook-libshared:
+ 	cd $(DESTDIR)$(libdir) && \
+-		$(LN_S) libcrypt.so libowcrypt.so && \
+-		$(LN_S) libcrypt.so.1 libowcrypt.so.1
++		$(LN_S) libxcrypt.so libowcrypt.so && \
++		$(LN_S) libxcrypt.so.1 libowcrypt.so.1
+ uninstall-hook-libshared:
+ 	-rm -f  $(DESTDIR)$(libdir)/libowcrypt.so \
+ 		$(DESTDIR)$(libdir)/libowcrypt.so.1
+@@ -231,7 +227,7 @@
+         test-getrandom-interface test-getrandom-fallbacks
+ 
+ if ENABLE_OBSOLETE_API
+-libcrypt_la_SOURCES += crypt-des-obsolete.c
++libxcrypt_la_SOURCES += crypt-des-obsolete.c
+ check_PROGRAMS += test-des-obsolete test-des-obsolete_r
+ endif
+ 
+@@ -252,7 +248,7 @@
+ EXTRA_DIST += test-symbols-static.sh test-symbols-compat.sh test-symbols-renames.sh
+ 
+ AM_TESTS_ENVIRONMENT = \
+-    lib_la="./libcrypt.la"; lib_map="$(srcdir)/libcrypt.map.in"; \
++    lib_la="./libxcrypt.la"; lib_map="$(srcdir)/libcrypt.map.in"; \
+     CC="$(CC)"; CPP="$(CPP)"; \
+     CPPFLAGS="$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)"; \
+     CPPFLAGS="$${CPPFLAGS} $(AM_CPPFLAGS) $(CPPFLAGS)"; \
+@@ -267,7 +263,7 @@
+ # Refer to object files that are linked into libxcrypt with the
+ # qualified name, libcrypt_la-foobar.lo, to prevent them from
+ # being compiled a second time.
+-COMMON_TEST_OBJECTS = libcrypt_la-crypt-common.lo libcrypt.la
++COMMON_TEST_OBJECTS = libxcrypt_la-crypt-common.lo libxcrypt.la
+ 
+ test_crypt_bcrypt_LDADD = $(COMMON_TEST_OBJECTS)
+ test_crypt_des_LDADD = $(COMMON_TEST_OBJECTS)
+@@ -293,53 +289,53 @@
+ # These tests call internal APIs that may not be accessible from the
+ # fully linked shared library.
+ test_alg_des_LDADD = \
+-	libcrypt_la-alg-des.lo \
+-	libcrypt_la-alg-des-tables.lo \
++	libxcrypt_la-alg-des.lo \
++	libxcrypt_la-alg-des-tables.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_gost3411_2012_LDADD = \
+-	libcrypt_la-alg-gost3411-2012-core.lo \
+-	libcrypt_la-alg-gost3411-2012-hmac.lo \
++	libxcrypt_la-alg-gost3411-2012-core.lo \
++	libxcrypt_la-alg-gost3411-2012-hmac.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_gost3411_2012_hmac_LDADD = \
+-	libcrypt_la-alg-gost3411-2012-core.lo \
+-	libcrypt_la-alg-gost3411-2012-hmac.lo \
++	libxcrypt_la-alg-gost3411-2012-core.lo \
++	libxcrypt_la-alg-gost3411-2012-hmac.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_hmac_sha1_LDADD = \
+-	libcrypt_la-alg-sha1.lo \
+-	libcrypt_la-alg-hmac-sha1.lo \
++	libxcrypt_la-alg-sha1.lo \
++	libxcrypt_la-alg-hmac-sha1.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_md4_LDADD = \
+-	libcrypt_la-alg-md4.lo \
++	libxcrypt_la-alg-md4.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_md5_LDADD = \
+-	libcrypt_la-alg-md5.lo \
++	libxcrypt_la-alg-md5.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_pbkdf_hmac_sha256_LDADD = \
+-	libcrypt_la-alg-sha256.lo \
++	libxcrypt_la-alg-sha256.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_sha1_LDADD = \
+-	libcrypt_la-alg-sha1.lo \
++	libxcrypt_la-alg-sha1.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_sha256_LDADD = \
+-	libcrypt_la-alg-sha256.lo \
++	libxcrypt_la-alg-sha256.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_alg_sha512_LDADD = \
+-	libcrypt_la-alg-sha512.lo \
++	libxcrypt_la-alg-sha512.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_crypt_gost_yescrypt_LDADD = \
+-	libcrypt_la-alg-gost3411-2012-core.lo \
+-	libcrypt_la-alg-gost3411-2012-hmac.lo \
+-	libcrypt_la-alg-sha256.lo \
+-	libcrypt_la-alg-yescrypt-common.lo \
+-	libcrypt_la-alg-yescrypt-opt.lo \
+-	libcrypt_la-crypt-yescrypt.lo \
++	libxcrypt_la-alg-gost3411-2012-core.lo \
++	libxcrypt_la-alg-gost3411-2012-hmac.lo \
++	libxcrypt_la-alg-sha256.lo \
++	libxcrypt_la-alg-yescrypt-common.lo \
++	libxcrypt_la-alg-yescrypt-opt.lo \
++	libxcrypt_la-crypt-yescrypt.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ 
+ test_getrandom_interface_LDADD = \
+-	libcrypt_la-randombytes.lo \
++	libxcrypt_la-randombytes.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ test_getrandom_fallbacks_LDADD = \
+-	libcrypt_la-randombytes.lo \
++	libxcrypt_la-randombytes.lo \
+ 	$(COMMON_TEST_OBJECTS)
+ 
+ if HAVE_LD_WRAP
+--- libxcrypt-4.4.0/libxcrypt.pc.in.orig	2018-11-19 20:39:12.000000000 +0100
++++ libxcrypt-4.4.0/libxcrypt.pc.in	2018-11-29 20:47:35.179590003 +0100
+@@ -11,5 +11,5 @@
+ Name: @PACKAGE@
+ Version: @VERSION@
+ Description: Extended crypt library for DES, MD5, Blowfish and others
+-Libs: -L${libdir} -lcrypt
++Libs: -L${libdir} -lxcrypt
+ Cflags: -I${includedir}

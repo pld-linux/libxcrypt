@@ -1,21 +1,19 @@
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
-Version:	3.1.1
+Version:	4.4.0
 Release:	1
-License:	LGPL v2.1+ (library), LGPL v2.1+/Public Domain (plugins)
+License:	LGPL v2.1+
 Group:		Libraries
 #Source0Download: https://github.com/besser82/libxcrypt/releases
 Source0:	https://github.com/besser82/libxcrypt/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	7eff183695f0dc4744b0f4bc8334eae9
-Patch0:		%{name}-noWerror.patch
-Patch1:		%{name}-libc-lock.patch
-Patch2:		%{name}-link.patch
+# Source0-md5:	13e9f41b9881956c529a028b636ff22b
+Patch0:		%{name}-xcrypt.patch
 URL:		https://github.com/besser82/libxcrypt
-BuildRequires:	autoconf >= 2.50
-BuildRequires:	automake >= 1:1.7
+BuildRequires:	autoconf >= 2.62
+BuildRequires:	automake >= 1:1.14
 BuildRequires:	libtool >= 2:2
-BuildRequires:	sed >= 4.0
+BuildRequires:	pkgconfig >= 1:0.27
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %undefine	__cxx
@@ -62,8 +60,6 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 %{__libtoolize}
@@ -72,21 +68,23 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %{__autoheader}
 %{__automake}
 %configure \
-	--libdir=/%{_lib}
+	--includedir=%{_includedir}/xcrypt \
+	--disable-obsolete-api \
+	--disable-werror \
+	--disable-xcrypt-compat-files
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_libdir}
+install -d $RPM_BUILD_ROOT/%{_lib}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%{__mv} $RPM_BUILD_ROOT/%{_lib}/libxcrypt.{so,la,a} $RPM_BUILD_ROOT%{_libdir}
-%{__sed} -i -e 's#/%{_lib}#%{_libdir}#g' $RPM_BUILD_ROOT%{_libdir}/libxcrypt.la
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so.* $RPM_BUILD_ROOT/%{_lib}
 ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/libxcrypt.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so
 
-%{__rm} $RPM_BUILD_ROOT/%{_lib}/xcrypt/*.{la,a}
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -96,18 +94,21 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-# COPYING specifies licenses for particular plugins
-%doc COPYING ChangeLog NEWS README*
+%doc AUTHORS ChangeLog LICENSING NEWS README.md THANKS TODO.md
 %attr(755,root,root) /%{_lib}/libxcrypt.so.*.*.*
 %attr(755,root,root) %ghost /%{_lib}/libxcrypt.so.2
-%dir /%{_lib}/xcrypt
-%attr(755,root,root) /%{_lib}/xcrypt/libxcrypt_*.so*
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libxcrypt.so
 %{_libdir}/libxcrypt.la
-%{_includedir}/xcrypt.h
+%{_includedir}/xcrypt
+%{_pkgconfigdir}/libcrypt.pc
+%{_pkgconfigdir}/libxcrypt.pc
+%{_mandir}/man3/crypt_checksalt.3*
+%{_mandir}/man3/crypt_gensalt*.3*
+%{_mandir}/man3/crypt_preferred_method.3*
+%{_mandir}/man5/crypt.5*
 
 %files static
 %defattr(644,root,root,755)
