@@ -1,8 +1,8 @@
---- libxcrypt-4.4.10/Makefile.am.orig	2019-09-18 18:07:41.000000000 +0200
-+++ libxcrypt-4.4.10/Makefile.am	2019-10-05 20:24:46.898848434 +0200
+--- libxcrypt-4.4.17/Makefile.am.orig	2020-08-23 09:49:51.000000000 +0200
++++ libxcrypt-4.4.17/Makefile.am	2020-08-23 10:47:59.294128962 +0200
 @@ -84,19 +84,15 @@
  	test/des-cases.h \
- 	test/crypt-kat.inc
+ 	test/ka-table.inc
  
 -if ENABLE_XCRYPT_COMPAT_FILES
  nodist_include_HEADERS += xcrypt.h
@@ -97,7 +97,7 @@
  uninstall-hook-libshared:
  	-rm -f  $(DESTDIR)$(libdir)/libowcrypt.so \
  		$(DESTDIR)$(libdir)/libowcrypt.so.1
-@@ -346,7 +342,7 @@
+@@ -401,7 +397,7 @@
  endif
  
  if ENABLE_OBSOLETE_API
@@ -106,16 +106,16 @@
  check_PROGRAMS += test/des-obsolete test/des-obsolete_r test/fcrypt-enosys
  endif
  
-@@ -365,7 +361,7 @@
- endif
+@@ -421,7 +417,7 @@
  
  AM_TESTS_ENVIRONMENT = \
--    lib_la="./libcrypt.la"; lib_map="$(srcdir)/lib/libcrypt.map.in"; \
-+    lib_la="./libxcrypt.la"; lib_map="$(srcdir)/lib/libcrypt.map.in"; \
-     CC="$(CC)"; CPP="$(CPP)"; \
-     CPPFLAGS="$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)"; \
-     CPPFLAGS="$${CPPFLAGS} $(AM_CPPFLAGS) $(CPPFLAGS)"; \
-@@ -378,7 +374,7 @@
+     host_os="$(host_os)"; \
+-    lib_la="./libcrypt.la"; \
++    lib_la="./libxcrypt.la"; \
+     lib_map="$(srcdir)/lib/libcrypt.map.in"; \
+     AWK="$(AWK)"; \
+     CC="$(CC)"; \
+@@ -438,7 +434,7 @@
  # Refer to object files that are linked into libxcrypt with the
  # qualified name, lib/libcrypt_la-foobar.lo, to prevent them from
  # being compiled a second time.
@@ -124,7 +124,7 @@
  
  test_badsalt_LDADD = $(COMMON_TEST_OBJECTS)
  test_badsetting_LDADD = $(COMMON_TEST_OBJECTS)
-@@ -400,58 +396,58 @@
+@@ -474,58 +470,58 @@
  # These tests call internal APIs that may not be accessible from the
  # fully linked shared library.
  test_alg_des_LDADD = \

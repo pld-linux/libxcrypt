@@ -1,13 +1,13 @@
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
-Version:	4.4.10
+Version:	4.4.17
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 #Source0Download: https://github.com/besser82/libxcrypt/releases
 Source0:	https://github.com/besser82/libxcrypt/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	3eb083c2528cdd37314080891d77e779
+# Source0-md5:	12118d098ead971f9a8377cacfdd0da7
 Patch0:		%{name}-xcrypt.patch
 URL:		https://github.com/besser82/libxcrypt
 BuildRequires:	autoconf >= 2.62
@@ -84,6 +84,8 @@ install -d $RPM_BUILD_ROOT/%{_lib}
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so.* $RPM_BUILD_ROOT/%{_lib}
 ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/libxcrypt.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so
 
+# obsoleted by pkg-config
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libxcrypt.la
 # PLD doesn't need Owl compatibility
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libowcrypt.*
 # packaged with glibc-devel
@@ -104,7 +106,6 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libxcrypt.so
-%{_libdir}/libxcrypt.la
 %{_includedir}/xcrypt
 %{_pkgconfigdir}/libcrypt.pc
 %{_pkgconfigdir}/libxcrypt.pc
