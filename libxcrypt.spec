@@ -1,3 +1,7 @@
+#
+# Conditional build:
+%bcond_with	default_crypt	# build as default libcrypt provider
+
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
@@ -15,9 +19,22 @@ BuildRequires:	automake >= 1:1.14
 BuildRequires:	gcc >= 5:3.2
 BuildRequires:	libtool >= 2:2
 BuildRequires:	pkgconfig >= 1:0.27
+%if %{with default_crypt}
+Provides:	crypt(blowfish)
+Obsoletes:	glibc-libcrypt
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %undefine	__cxx
+
+%if %{with default_crypt}
+%define		libname		libcrypt
+%define		libver		1
+%else
+%define		libname		libxcrypt
+%define		libver		2
+%endif
+
 
 %description
 libxcrypt is a replacement for libcrypt, which comes with the GNU C
@@ -60,7 +77,7 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 
 %prep
 %setup -q
-%patch0 -p1
+%{!?with_default_crypt:%patch0 -p1}
 
 %build
 %{__libtoolize}
@@ -81,15 +98,15 @@ install -d $RPM_BUILD_ROOT/%{_lib}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%{__mv} $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so.* $RPM_BUILD_ROOT/%{_lib}
-ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/libxcrypt.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libxcrypt.so
+%{__mv} $RPM_BUILD_ROOT%{_libdir}/%{libname}.so.* $RPM_BUILD_ROOT/%{_lib}
+ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/%{libname}.so
 
 # obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libxcrypt.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/%{libname}.la
 # PLD doesn't need Owl compatibility
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libowcrypt.*
 # packaged with glibc-devel
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*
+%{!?with_default_crypt:%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -100,20 +117,26 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog LICENSING NEWS README.md THANKS TODO.md
-%attr(755,root,root) /%{_lib}/libxcrypt.so.*.*.*
-%attr(755,root,root) %ghost /%{_lib}/libxcrypt.so.2
+%attr(755,root,root) /%{_lib}/%{libname}.so.*.*.*
+%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libver}
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libxcrypt.so
+%attr(755,root,root) %{_libdir}/%{libname}.so
 %{_includedir}/xcrypt
 %{_pkgconfigdir}/libcrypt.pc
 %{_pkgconfigdir}/libxcrypt.pc
 %{_mandir}/man3/crypt_checksalt.3*
 %{_mandir}/man3/crypt_gensalt*.3*
 %{_mandir}/man3/crypt_preferred_method.3*
+%if %{with default_crypt}
+%{_mandir}/man3/crypt.3*
+%{_mandir}/man3/crypt_r.3*
+%{_mandir}/man3/crypt_ra.3*
+%{_mandir}/man3/crypt_rn.3*
+%endif
 %{_mandir}/man5/crypt.5*
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libxcrypt.a
+%{_libdir}/%{libname}.a
