@@ -124,7 +124,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/%{libname}.so
 %if %{with default_crypt}
-%{_includedir}/*.h
+%{_includedir}/crypt.h
 %else
 %{_includedir}/xcrypt
 %endif
