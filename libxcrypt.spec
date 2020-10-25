@@ -86,7 +86,7 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %{__autoheader}
 %{__automake}
 %configure \
-	--includedir=%{_includedir}/xcrypt \
+	%{!?with_default_crypt:--includedir=%{_includedir}/xcrypt} \
 	--disable-werror \
 	--disable-xcrypt-compat-files
 %{__make}
@@ -123,7 +123,11 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/%{libname}.so
+%if %{with default_crypt}
+%{_includedir}/*.h
+%else
 %{_includedir}/xcrypt
+%endif
 %{_pkgconfigdir}/libcrypt.pc
 %{_pkgconfigdir}/libxcrypt.pc
 %{_mandir}/man3/crypt_checksalt.3*
