@@ -1,5 +1,5 @@
---- libxcrypt-4.4.17/Makefile.am.orig	2020-08-23 09:49:51.000000000 +0200
-+++ libxcrypt-4.4.17/Makefile.am	2020-08-23 10:47:59.294128962 +0200
+--- libxcrypt-4.4.18/Makefile.am.orig	2021-02-20 21:34:36.000000000 +0100
++++ libxcrypt-4.4.18/Makefile.am	2021-02-26 07:13:19.480003785 +0100
 @@ -84,19 +84,15 @@
  	test/des-cases.h \
  	test/ka-table.inc
@@ -47,13 +47,13 @@
 -libcrypt_la_CPPFLAGS = $(AM_CPPFLAGS) -DIN_LIBCRYPT
 +libxcrypt_la_CPPFLAGS = $(AM_CPPFLAGS) -DIN_LIBCRYPT
  
- CONFIG_STATUS_DEPENDENCIES = lib/libcrypt.minver.$(MINVER_OS)
+ CONFIG_STATUS_DEPENDENCIES = lib/libcrypt.minver
 -EXTRA_libcrypt_la_DEPENDENCIES = libcrypt.map
 +EXTRA_libxcrypt_la_DEPENDENCIES = libcrypt.map
  CLEANFILES = \
  	Makefile.deps Makefile.deps.T \
  	libcrypt.map libcrypt.map.T \
-@@ -234,9 +230,9 @@
+@@ -236,9 +232,9 @@
  	uninstall-hook-xcrypt-static
  install-exec-hook-xcrypt-static:
  	cd $(DESTDIR)$(libdir) && \
@@ -65,7 +65,7 @@
  endif
  
  if ENABLE_SHARED
-@@ -249,9 +245,9 @@
+@@ -251,9 +247,9 @@
  	uninstall-hook-xcrypt-shared
  install-exec-hook-xcrypt-shared:
  	cd $(DESTDIR)$(libdir) && \
@@ -77,7 +77,7 @@
  endif
  endif
  
-@@ -278,7 +274,7 @@
+@@ -280,7 +276,7 @@
  	uninstall-hook-libstatic
  install-exec-hook-libstatic:
  	cd $(DESTDIR)$(libdir) && \
@@ -86,7 +86,7 @@
  uninstall-hook-libstatic:
  	-rm -f $(DESTDIR)$(libdir)/libowcrypt.a
  endif
-@@ -291,8 +287,8 @@
+@@ -293,8 +289,8 @@
  	uninstall-hook-libshared
  install-exec-hook-libshared:
  	cd $(DESTDIR)$(libdir) && \
@@ -97,7 +97,16 @@
  uninstall-hook-libshared:
  	-rm -f  $(DESTDIR)$(libdir)/libowcrypt.so \
  		$(DESTDIR)$(libdir)/libowcrypt.so.1
-@@ -401,7 +397,7 @@
+@@ -391,7 +387,7 @@
+ # This is very slow and requires nonstandard Python libraries and a shared
+ # library build of libcrypt already present in the build-tree, so we only
+ # do it when explicitly requested.
+-regen-ka-table: libcrypt.la
++regen-ka-table: libxcrypt.la
+ 	$(PYTHON) $(srcdir)/test/ka-table-gen.py > ka-table.inc.T
+ 	@if cmp -s ka-table.inc.T $(srcdir)/test/ka-table.inc; \
+ 	then echo ka-table.inc is unchanged; rm ka-table.inc.T; \
+@@ -403,7 +399,7 @@
  endif
  
  if ENABLE_OBSOLETE_API
@@ -106,16 +115,16 @@
  check_PROGRAMS += test/des-obsolete test/des-obsolete_r test/fcrypt-enosys
  endif
  
-@@ -421,7 +417,7 @@
+@@ -418,7 +414,7 @@
+ endif
  
  AM_TESTS_ENVIRONMENT = \
-     host_os="$(host_os)"; \
 -    lib_la="./libcrypt.la"; \
 +    lib_la="./libxcrypt.la"; \
      lib_map="$(srcdir)/lib/libcrypt.map.in"; \
-     AWK="$(AWK)"; \
-     CC="$(CC)"; \
-@@ -438,7 +434,7 @@
+     HAVE_CPP_dD="$(HAVE_CPP_dD)"; \
+     SYMBOL_PREFIX="$(SYMBOL_PREFIX)"; \
+@@ -445,7 +441,7 @@
  # Refer to object files that are linked into libxcrypt with the
  # qualified name, lib/libcrypt_la-foobar.lo, to prevent them from
  # being compiled a second time.
@@ -124,7 +133,7 @@
  
  test_badsalt_LDADD = $(COMMON_TEST_OBJECTS)
  test_badsetting_LDADD = $(COMMON_TEST_OBJECTS)
-@@ -474,58 +470,58 @@
+@@ -481,58 +477,58 @@
  # These tests call internal APIs that may not be accessible from the
  # fully linked shared library.
  test_alg_des_LDADD = \
