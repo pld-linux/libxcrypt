@@ -1,12 +1,12 @@
 #
 # Conditional build:
-%bcond_with	default_crypt	# build as default libcrypt provider
+%bcond_without	default_crypt	# build as default libcrypt provider
 
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
 Version:	4.4.25
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Libraries
 #Source0Download: https://github.com/besser82/libxcrypt/releases
@@ -87,9 +87,14 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %{__autoheader}
 %{__automake}
 %configure \
-	%{!?with_default_crypt:--includedir=%{_includedir}/xcrypt} \
-	--disable-werror \
-	--disable-xcrypt-compat-files
+%if %{with default_crypt}
+	--enable-obsolete-api=glibc \
+	--enable-obsolete-api-enosys=yes \
+%else
+	--includedir=%{_includedir}/xcrypt \
+	--disable-xcrypt-compat-files \
+%endif
+	--disable-werror
 %{__make}
 
 %install
@@ -104,8 +109,6 @@ ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.*.*.*) $RPM_BU
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{libname}.la
-# PLD doesn't need Owl compatibility
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libowcrypt.*
 # packaged with glibc-devel
 %{!?with_default_crypt:%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*}
 
@@ -126,6 +129,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/%{libname}.so
 %if %{with default_crypt}
 %{_includedir}/crypt.h
+%{_includedir}/xcrypt.h
+%attr(755,root,root) %{_libdir}/libxcrypt.so
 %else
 %{_includedir}/xcrypt
 %endif
@@ -145,3 +150,6 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/%{libname}.a
+%if %{with default_crypt}
+%{_libdir}/libxcrypt.a
+%endif
