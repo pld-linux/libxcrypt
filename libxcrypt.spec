@@ -5,13 +5,13 @@
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
-Version:	4.4.25
-Release:	3
+Version:	4.4.26
+Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 #Source0Download: https://github.com/besser82/libxcrypt/releases
 Source0:	https://github.com/besser82/libxcrypt/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	4828b1530f5bf35af0b45b35acc4db1d
+# Source0-md5:	4036f4dda35ad8d18b894da426dbf7cd
 Patch0:		%{name}-xcrypt.patch
 URL:		https://github.com/besser82/libxcrypt
 BuildRequires:	autoconf >= 2.62
@@ -108,8 +108,13 @@ ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.*.*.*) $RPM_BU
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{libname}.la
+
+%if %{without default_crypt}
+# PLD doesn't need Owl compatibility
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libowcrypt.*
 # packaged with glibc-devel
-%{!?with_default_crypt:%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*}
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/crypt{,_r,_ra,_rn}.3*
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
