@@ -52,6 +52,7 @@ Summary(pl.UTF-8):	Plik nagłówkowy biblioteki libxcrypt
 License:	LGPL v2.1+
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Conflicts:	glibc-devel-doc < 6:2.34-7
 
 %description devel
 This package contains the header file to develop software using
