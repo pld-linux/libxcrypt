@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	default_crypt	# build as default libcrypt provider
+%bcond_without  tests
 
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
@@ -96,6 +97,10 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %endif
 	--disable-werror
 %{__make}
+
+%if %{with tests}
+%{__make} check
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
