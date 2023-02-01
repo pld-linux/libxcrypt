@@ -1,13 +1,14 @@
 #
 # Conditional build:
-%bcond_without	default_crypt	# build as default libcrypt provider
+%bcond_without  compat_pkg
+%bcond_without  default_crypt
 %bcond_without  tests
 
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
 Version:	4.4.33
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Libraries
 #Source0Download: https://github.com/besser82/libxcrypt/releases
@@ -27,14 +28,33 @@ Obsoletes:	glibc-libcrypt
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%undefine	__cxx
+%undefine       __cxx
 
 %if %{with default_crypt}
-%define		libname		libcrypt
-%define		libver		1
+%define         libname         libcrypt
+%define         libver          2
+%define         libvercompat    1
 %else
-%define		libname		libxcrypt
-%define		libver		2
+%undefine       with_compat_pkg
+%define         libname         libxcrypt
+%define         libver          2
+%endif
+
+%if %{with compat_pkg}
+%package        compat
+Summary:	Compatibility library providing legacy API functions
+Requires:	%{name} = %{version}-%{release}
+
+%description    compat
+This package contains the library providing the compatibility API for
+applications that are linked against glibc's libxcrypt, or that are
+still using the unsafe and deprecated, encrypt, encrypt_r, setkey,
+setkey_r, and fcrypt functions, which are still required by recent
+versions of POSIX, the Single UNIX Specification, and various other
+standards.
+
+All existing binary executables linked against glibc's libcrypt should
+work unmodified with the library supplied by this package.
 %endif
 
 %description
@@ -87,10 +107,14 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-%configure \
+
+install -d regular
+cd regular
+../%configure \
+        --enable-hashes=all \
 %if %{with default_crypt}
-	--enable-obsolete-api=glibc \
-	--enable-obsolete-api-enosys=yes \
+	--enable-obsolete-api=no \
+	--enable-obsolete-api-enosys=no \
 %else
 	--includedir=%{_includedir}/xcrypt \
 	--disable-xcrypt-compat-files \
@@ -101,16 +125,42 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %if %{with tests}
 %{__make} check
 %endif
+cd ..
+
+%if %{with compat_pkg}
+install -d compat
+cd compat
+../%configure \
+        --enable-hashes=all \
+        --enable-obsolete-api=glibc \
+        --enable-obsolete-api-enosys=yes \
+        --enable-hashes=all \
+        --disable-werror
+%{__make}
+
+%if %{with tests}
+%{__make} check
+%endif
+cd ..
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/%{_lib}
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+%if %{with compat_pkg}
+%{__make} -C compat install \
+        DESTDIR=$RPM_BUILD_ROOT
+
+# clean everything beside library
+find $RPM_BUILD_ROOT -not -type d -not -name 'libcrypt.so.%{libvercompat}*' -delete -print
+%endif
+
+%{__make} -C regular install \
+        DESTDIR=$RPM_BUILD_ROOT
 
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/%{libname}.so.* $RPM_BUILD_ROOT/%{_lib}
-ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/%{libname}.so
+ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.%{libver}.*.*) $RPM_BUILD_ROOT%{_libdir}/%{libname}.so
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{libname}.la
@@ -129,24 +179,29 @@ rm -rf $RPM_BUILD_ROOT
 %postun -p /sbin/ldconfig
 
 %posttrans
-if [ ! -L /%{_lib}/%{libname}.so.%{libver} ]; then
-	%{__rm} -f /%{_lib}/%{libname}.so.%{libver}
+if [ ! -L /%{_lib}/%{libname}.so.1 ]; then
+	%{__rm} -f /%{_lib}/%{libname}.so.1
 	/sbin/ldconfig
 fi
 
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog LICENSING NEWS README.md THANKS TODO.md
-%attr(755,root,root) /%{_lib}/%{libname}.so.*.*.*
+%attr(755,root,root) /%{_lib}/%{libname}.so.%{libver}.*.*
 %attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libver}
+
+%if %{with compat_pkg}
+%files compat
+%defattr(644,root,root,755)
+%attr(755,root,root) /%{_lib}/%{libname}.so.%{libvercompat}.*.*
+%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libvercompat}
+%endif
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/%{libname}.so
 %if %{with default_crypt}
 %{_includedir}/crypt.h
-%{_includedir}/xcrypt.h
-%attr(755,root,root) %{_libdir}/libxcrypt.so
 %else
 %{_includedir}/xcrypt
 %endif
@@ -166,6 +221,3 @@ fi
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/%{libname}.a
-%if %{with default_crypt}
-%{_libdir}/libxcrypt.a
-%endif
