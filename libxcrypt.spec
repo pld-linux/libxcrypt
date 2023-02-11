@@ -1,8 +1,8 @@
 #
 # Conditional build:
-%bcond_without  compat_pkg
-%bcond_without  default_crypt
-%bcond_without  tests
+%bcond_without  compat_pkg	# compat package (libcrypt.so.1 with legacy APIs)
+%bcond_without  default_crypt	# libxcrypt as default libcrypt
+%bcond_without  tests		# testing
 
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
@@ -24,36 +24,21 @@ BuildRequires:	libtool >= 2:2
 BuildRequires:	pkgconfig >= 1:0.27
 %if %{with default_crypt}
 Provides:	crypt(blowfish)
-Obsoletes:	glibc-libcrypt
+Obsoletes:	glibc-libcrypt < 6:2.37
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %undefine       __cxx
 
 %if %{with default_crypt}
-%define         libname         libcrypt
-%define         libver          2
-%define         libvercompat    1
+%define         libname		libcrypt
+%define         libver		2
+%define         libvercompat	1
 %else
 %undefine       with_compat_pkg
-%define         libname         libxcrypt
-%define         libver          2
+%define         libname		libxcrypt
+%define         libver		2
 %endif
-
-%package        compat
-Summary:	Compatibility library providing legacy API functions
-Requires:	%{name} = %{version}-%{release}
-
-%description    compat
-This package contains the library providing the compatibility API for
-applications that are linked against glibc's libxcrypt, or that are
-still using the unsafe and deprecated, encrypt, encrypt_r, setkey,
-setkey_r, and fcrypt functions, which are still required by recent
-versions of POSIX, the Single UNIX Specification, and various other
-standards.
-
-All existing binary executables linked against glibc's libcrypt should
-work unmodified with the library supplied by this package.
 
 %description
 libxcrypt is a replacement for libcrypt, which comes with the GNU C
@@ -95,6 +80,33 @@ development.
 %description static -l pl.UTF-8
 Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 
+%package compat
+Summary:	Compatibility library providing legacy API functions
+Summary(pl.UTF-8):	Biblioteka zgodności wstecznej dostarczająca dawne funkcje API
+Requires:	%{name} = %{version}-%{release}
+
+%description compat
+This package contains the library providing the compatibility API for
+applications that are linked against glibc's libcrypt, or that are
+still using the unsafe and deprecated, encrypt, encrypt_r, setkey,
+setkey_r, and fcrypt functions, which are still required by recent
+versions of POSIX, the Single UNIX Specification, and various other
+standards.
+
+All existing binary executables linked against glibc's libcrypt should
+work unmodified with the library supplied by this package.
+
+%description compat -l pl.UTF-8
+Ten pakiet zawiera bibliotekę dostarczającą API zgodności wstecznej
+dla aplikacji skonsolidowanych z biblioteką libcrypt z glibc lub
+nadal wykorzystujących niebezpieczne i przestarzałe funkcje encrypt,
+encrypt_r, setkey, setkey_r oraz fcrypt, nadal wymagane przez obecne
+wersje standardów POSIX, Single UNIX Specification i innych.
+
+Wszystkie istniejące programy wykonywalne skonsolidowane z biblioteką
+libcrypt z glibc powinny działać bez modyfikacji z biblioteką
+dostarczaną przez ten pakiet.
+
 %prep
 %setup -q
 %{!?with_default_crypt:%patch0 -p1}
@@ -111,8 +123,8 @@ cd regular
 ../%configure \
         --enable-hashes=all \
 %if %{with default_crypt}
-	--enable-obsolete-api=no \
-	--enable-obsolete-api-enosys=no \
+	--disable-obsolete-api \
+	--disable-obsolete-api-enosys \
 %else
 	--includedir=%{_includedir}/xcrypt \
 	--disable-xcrypt-compat-files \
@@ -129,11 +141,10 @@ cd ..
 install -d compat
 cd compat
 ../%configure \
-        --enable-hashes=all \
-        --enable-obsolete-api=glibc \
-        --enable-obsolete-api-enosys=yes \
-        --enable-hashes=all \
-        --disable-werror
+	--enable-hashes=all \
+	--enable-obsolete-api=glibc \
+	--enable-obsolete-api-enosys \
+	--disable-werror
 %{__make}
 
 %if %{with tests}
@@ -148,14 +159,14 @@ install -d $RPM_BUILD_ROOT/%{_lib}
 
 %if %{with compat_pkg}
 %{__make} -C compat install \
-        DESTDIR=$RPM_BUILD_ROOT
+	DESTDIR=$RPM_BUILD_ROOT
 
 # clean everything beside library
 find $RPM_BUILD_ROOT -not -type d -not -name 'libcrypt.so.%{libvercompat}*' -delete -print
 %endif
 
 %{__make} -C regular install \
-        DESTDIR=$RPM_BUILD_ROOT
+	DESTDIR=$RPM_BUILD_ROOT
 
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/%{libname}.so.* $RPM_BUILD_ROOT/%{_lib}
 ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.%{libver}.*.*) $RPM_BUILD_ROOT%{_libdir}/%{libname}.so
@@ -173,13 +184,13 @@ ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.%{libver}.*.*)
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post	-p /sbin/ldconfig
+%postun	-p /sbin/ldconfig
 
-%post compat -p /sbin/ldconfig
-%postun compat -p /sbin/ldconfig
+%post	compat -p /sbin/ldconfig
+%postun	compat -p /sbin/ldconfig
 
-%posttrans
+%posttrans compat
 if [ ! -L /%{_lib}/%{libname}.so.1 ]; then
 	%{__rm} -f /%{_lib}/%{libname}.so.1
 	/sbin/ldconfig
@@ -190,13 +201,6 @@ fi
 %doc AUTHORS ChangeLog LICENSING NEWS README.md THANKS TODO.md
 %attr(755,root,root) /%{_lib}/%{libname}.so.%{libver}.*.*
 %attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libver}
-
-%if %{with compat_pkg}
-%files compat
-%defattr(644,root,root,755)
-%attr(755,root,root) /%{_lib}/%{libname}.so.%{libvercompat}.*.*
-%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libvercompat}
-%endif
 
 %files devel
 %defattr(644,root,root,755)
@@ -222,3 +226,10 @@ fi
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/%{libname}.a
+
+%if %{with compat_pkg}
+%files compat
+%defattr(644,root,root,755)
+%attr(755,root,root) /%{_lib}/%{libname}.so.%{libvercompat}.*.*
+%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libvercompat}
+%endif
