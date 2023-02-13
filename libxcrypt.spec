@@ -32,12 +32,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %if %{with default_crypt}
 %define         libname		libcrypt
-%define         libver		2
-%define         libvercompat	1
 %else
 %undefine       with_compat_pkg
 %define         libname		libxcrypt
-%define         libver		2
 %endif
 
 %description
@@ -162,14 +159,14 @@ install -d $RPM_BUILD_ROOT/%{_lib}
 	DESTDIR=$RPM_BUILD_ROOT
 
 # clean everything beside library
-find $RPM_BUILD_ROOT -not -type d -not -name 'libcrypt.so.%{libvercompat}*' -delete -print
+find $RPM_BUILD_ROOT -not -type d -not -name 'libcrypt.so.1*' -delete -print
 %endif
 
 %{__make} -C regular install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 %{__mv} $RPM_BUILD_ROOT%{_libdir}/%{libname}.so.* $RPM_BUILD_ROOT/%{_lib}
-ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.%{libver}.*.*) $RPM_BUILD_ROOT%{_libdir}/%{libname}.so
+ln -snf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/%{libname}.so.2.*.*) $RPM_BUILD_ROOT%{_libdir}/%{libname}.so
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/%{libname}.la
@@ -191,16 +188,16 @@ rm -rf $RPM_BUILD_ROOT
 %postun	compat -p /sbin/ldconfig
 
 %posttrans compat
-if [ ! -L /%{_lib}/%{libname}.so.1 ]; then
-	%{__rm} -f /%{_lib}/%{libname}.so.1
+if [ ! -L /%{_lib}/libcrypt.so.1 ]; then
+	%{__rm} -f /%{_lib}/libcrypt.so.1
 	/sbin/ldconfig
 fi
 
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog LICENSING NEWS README.md THANKS TODO.md
-%attr(755,root,root) /%{_lib}/%{libname}.so.%{libver}.*.*
-%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libver}
+%attr(755,root,root) /%{_lib}/%{libname}.so.2.*.*
+%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.2
 
 %files devel
 %defattr(644,root,root,755)
@@ -230,6 +227,6 @@ fi
 %if %{with compat_pkg}
 %files compat
 %defattr(644,root,root,755)
-%attr(755,root,root) /%{_lib}/%{libname}.so.%{libvercompat}.*.*
-%attr(755,root,root) %ghost /%{_lib}/%{libname}.so.%{libvercompat}
+%attr(755,root,root) /%{_lib}/libcrypt.so.1.*.*
+%attr(755,root,root) %ghost /%{_lib}/libcrypt.so.1
 %endif
