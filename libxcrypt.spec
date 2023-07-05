@@ -7,13 +7,13 @@
 Summary:	Crypt Library for DES, MD5, and Blowfish
 Summary(pl.UTF-8):	Biblioteka szyfrująca hasła obsługująca DES, MD5 i Blowfish
 Name:		libxcrypt
-Version:	4.4.35
+Version:	4.4.36
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 #Source0Download: https://github.com/besser82/libxcrypt/releases
 Source0:	https://github.com/besser82/libxcrypt/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	2e95a81c7770ec2070ad03a5949a38a1
+# Source0-md5:	ab64e1c0687d9e08b9c690129dc38ea7
 Patch0:		%{name}-xcrypt.patch
 URL:		https://github.com/besser82/libxcrypt
 BuildRequires:	autoconf >= 2.62
