@@ -107,7 +107,7 @@ dostarczaną przez ten pakiet.
 
 %prep
 %setup -q
-%{!?with_default_crypt:%patch0 -p1}
+%{!?with_default_crypt:%patch -P0 -p1}
 
 %build
 %{__libtoolize}
