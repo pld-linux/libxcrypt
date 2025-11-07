@@ -22,6 +22,7 @@ BuildRequires:	gcc >= 5:3.2
 BuildRequires:	libltdl-devel
 BuildRequires:	libtool >= 2:2
 BuildRequires:	pkgconfig >= 1:0.27
+BuildRequires:	rpmbuild(macros) >= 2.043
 %if %{with default_crypt}
 Provides:	crypt(blowfish)
 Obsoletes:	glibc-libcrypt < 6:2.37
@@ -117,7 +118,8 @@ dostarczaną przez ten pakiet.
 
 install -d regular
 cd regular
-../%configure \
+%define		configuredir	..
+%configure \
 	--enable-hashes=all \
 %if %{with default_crypt}
 	--disable-obsolete-api \
@@ -137,7 +139,7 @@ cd ..
 %if %{with compat_pkg}
 install -d compat
 cd compat
-../%configure \
+%configure \
 	--enable-hashes=all \
 	--enable-obsolete-api=glibc \
 	--enable-obsolete-api-enosys \
