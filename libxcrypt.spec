@@ -53,7 +53,7 @@ Summary:	Header file for libxcrypt
 Summary(pl.UTF-8):	Plik nagłówkowy biblioteki libxcrypt
 License:	LGPL v2.1+
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 %{?with_default_crypt:Conflicts:	glibc-devel-doc < 6:2.34-7}
 
 %description devel
@@ -69,7 +69,7 @@ Summary:	Static libxcrypt library
 Summary(pl.UTF-8):	Statyczna biblioteka libxcrypt
 License:	LGPL v2.1+
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
+Requires:	%{name}-devel%{?_isa} = %{version}-%{release}
 
 %description static
 This package contains the static libxcrypt library used for
@@ -81,7 +81,7 @@ Ten pakiet zawiera statyczną wersję biblioteki libxcrypt.
 %package compat
 Summary:	Compatibility library providing legacy API functions
 Summary(pl.UTF-8):	Biblioteka zgodności wstecznej dostarczająca dawne funkcje API
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description compat
 This package contains the library providing the compatibility API for
