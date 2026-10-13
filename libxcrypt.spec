@@ -15,6 +15,8 @@ Group:		Libraries
 Source0:	https://github.com/besser82/libxcrypt/archive/v%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	58533fef6469e7d54f5f70a21952869a
 Patch0:		%{name}-xcrypt.patch
+# https://github.com/besser82/libxcrypt/commit/174c24d6e87aeae631bc0a7bb1ba983cf8def4de
+Patch1:		%{name}-const.patch
 URL:		https://github.com/besser82/libxcrypt
 BuildRequires:	autoconf >= 2.62
 BuildRequires:	automake >= 1:1.14
@@ -108,6 +110,7 @@ dostarczaną przez ten pakiet.
 %prep
 %setup -q
 %{!?with_default_crypt:%patch -P0 -p1}
+%patch -P1 -p1
 
 %build
 %{__libtoolize}
@@ -123,12 +126,11 @@ cd regular
 	--enable-hashes=all \
 %if %{with default_crypt}
 	--disable-obsolete-api \
-	--disable-obsolete-api-enosys \
+	--disable-obsolete-api-enosys
 %else
 	--includedir=%{_includedir}/xcrypt \
-	--disable-xcrypt-compat-files \
+	--disable-xcrypt-compat-files
 %endif
-	--disable-werror
 %{__make}
 
 %if %{with tests}
@@ -142,8 +144,7 @@ cd compat
 %configure \
 	--enable-hashes=all \
 	--enable-obsolete-api=glibc \
-	--enable-obsolete-api-enosys \
-	--disable-werror
+	--enable-obsolete-api-enosys
 %{__make}
 
 %if %{with tests}
